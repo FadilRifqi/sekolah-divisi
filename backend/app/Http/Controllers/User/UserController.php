@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -15,7 +17,7 @@ class UserController extends Controller
         $user = User::all();
 
         // Kembalikan response dengan status 200 dan pesan sukses
-        return response()->json($user,200);
+        return response()->json(UserResource::collection($user),200);
     }
     public function get($id){
         try {
@@ -28,7 +30,7 @@ class UserController extends Controller
             }
 
             // Kembalikan response dengan status 200 dan pesan sukses
-            return response()->json($user, 200);
+            return response()->json(UserResource::collection($user), 200);
 
         } catch (\Exception $e) {
             // Tangkap kesalahan lain dan kembalikan response dengan status 500
@@ -48,7 +50,11 @@ class UserController extends Controller
             ]);
 
             // Buat pengguna baru
-            $user = User::create($validatedData);
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password)
+            ]);
 
             // Kembalikan response JSON dengan status 201 (Created)
             return response()->json($user, 201);
@@ -97,10 +103,14 @@ class UserController extends Controller
             }
 
             // Update user dengan data baru
-            $user->update($validatedData);
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password) || $user->password
+            ]);
 
             // Kembalikan response dengan data user yang telah diupdate dan status 200
-            return response()->json($user, 200);
+            return response()->json(UserResource::collection($user), 200);
 
         } catch (ValidationException $e) {
             // Tangkap kesalahan validasi dan kembalikan response dengan status $e->status
