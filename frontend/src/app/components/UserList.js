@@ -10,13 +10,7 @@ const UserList = () => {
     const fetchData = async () => {
       try {
         const response = await axiosInstance.get(
-          `http://127.0.0.1:8000/api/user`,
-          {
-            headers: {
-              "Cache-Control": "no-cache",
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          }
+          `http://127.0.0.1:8000/api/user`
         );
         setData(response.data);
       } catch (error) {
@@ -32,7 +26,9 @@ const UserList = () => {
       <h2>User List</h2>
       <ul>
         {data.map((user) => (
-          <li key={user.email}>{user.name}</li>
+          <li key={user.email}>
+            {user.name} - {user.email}
+          </li>
         ))}
       </ul>
     </div>
